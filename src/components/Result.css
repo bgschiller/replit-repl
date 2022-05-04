@@ -17,7 +17,10 @@ button.expand-collapse {
   color: rgb(42, 42, 183);
 }
 
-.result .one-line-array-or-object .key {
+.result .one-line .key {
   font-weight: unset;
   color: grey;
+}
+.one-line.function pre {
+  display: inline-block;
 }

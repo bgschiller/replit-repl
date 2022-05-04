@@ -45,7 +45,7 @@ export default function Result({
     return <span className="thrown-error">Error: {root.value}</span>;
   }
   if (root.type === "function") {
-    return <span className="function">ƒ</span>;
+    return <FunctionDisplay heap={heap} id={id} depth={depth - 1} />;
   }
   if (root.type === "regexp") {
     return (
@@ -64,16 +64,24 @@ export default function Result({
   }
 }
 
+function FunctionDisplay({ heap, id, depth }: ResultProps): JSX.Element {
+  const obj = heap[id];
+  if (obj.type !== "function") return <></>;
+
+  return (
+    <span className="one-line function">
+      {depth > 0 ? <pre>{obj.value.body}</pre> : <>ƒ(){"{ … }"}</>}
+    </span>
+  );
+}
+
 function ObjectDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   const obj = heap[id];
   const [expanded, setExpanded] = useState(false);
   if (obj.type !== "object") return <></>; // tell TS what type we're working with
   return (
     <>
-      <span
-        className="one-line-array-or-object"
-        onClick={() => setExpanded(!expanded)}
-      >
+      <span className="one-line" onClick={() => setExpanded(!expanded)}>
         {depth > 0 ? (
           <>
             <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
@@ -108,10 +116,7 @@ function ArrayDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   if (obj.type !== "array") return <></>; // tell TS what type we're working with
   return (
     <>
-      <span
-        className="one-line-array-or-object"
-        onClick={() => setExpanded(!expanded)}
-      >
+      <span className="one-line" onClick={() => setExpanded(!expanded)}>
         {depth > 0 ? (
           <>
             <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
