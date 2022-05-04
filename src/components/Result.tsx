@@ -7,8 +7,14 @@ export interface ResultProps {
   heap: Heap;
   id: ID;
   isKey?: boolean;
+  depth: number;
 }
-export default function Result({ heap, id, isKey }: ResultProps): JSX.Element {
+export default function Result({
+  heap,
+  id,
+  isKey,
+  depth,
+}: ResultProps): JSX.Element {
   const root = heap[id || 0];
   if (root.type === "number") return <>{root.value}</>;
   if (root.type === "string") {
@@ -29,13 +35,26 @@ export default function Result({ heap, id, isKey }: ResultProps): JSX.Element {
     return <span className="error">{root.value.message}</span>;
   }
   if (root.type === "object") {
-    return <ObjectDisplay heap={heap} id={id} />;
+    return <ObjectDisplay heap={heap} id={id} depth={depth - 1} />;
   }
   if (root.type === "array") {
-    return <ArrayDisplay heap={heap} id={id} />;
+    return <ArrayDisplay heap={heap} id={id} depth={depth - 1} />;
   }
   if (root.type === "thrown-error") {
     return <span className="thrown-error">Error: {root.value}</span>;
+  }
+  if (root.type === "function") {
+    return <span className="function">ƒ</span>;
+  }
+  if (root.type === "regexp") {
+    return (
+      <span className="regex">
+        <span className="syntax">/</span>
+        {root.value.src}
+        <span className="syntax">/</span>
+        {root.value.flags}
+      </span>
+    );
   }
   try {
     assertUnreachable(root);
@@ -44,81 +63,87 @@ export default function Result({ heap, id, isKey }: ResultProps): JSX.Element {
   }
 }
 
-function ObjectDisplay({ heap, id }: ResultProps): JSX.Element {
+function ObjectDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   const obj = heap[id];
   const [expanded, setExpanded] = useState(false);
   if (obj.type !== "object") return <></>; // tell TS what type we're working with
   return (
     <>
-      <button
-        className="expand-collapse"
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? "▼" : "▶"}
-      </button>
+      <span onClick={() => setExpanded(!expanded)}>
+        {depth > 0 ? (
+          <>
+            <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
+            <span className="syntax">{"{ "}</span>
+            {obj.value.map(({ key, value }, ix) => {
+              return (
+                <span key={key}>
+                  <Result heap={heap} id={key} isKey depth={depth - 1} />
+                  <span className="syntax">: </span>
+                  <Result heap={heap} id={value} depth={depth - 1} />
+                  {ix < obj.value.length - 1 ? (
+                    <span className="syntax">, </span>
+                  ) : null}
+                </span>
+              );
+            })}
+            <span className="syntax">{" }"}</span>
+          </>
+        ) : (
+          "{…}"
+        )}
+      </span>
 
-      <span className="syntax">{"{ "}</span>
-      {obj.value.map(({ key, value }, ix) => {
-        return (
-          <span key={key}>
-            <Result heap={heap} id={key} isKey />
-            <span className="syntax">: </span>
-            <Result heap={heap} id={value} />
-            {ix < obj.value.length - 1 ? (
-              <span className="syntax">, </span>
-            ) : null}
-          </span>
-        );
-      })}
-      <span className="syntax">{" }"}</span>
-      {expanded ? <ExpandedObject heap={heap} id={id} indent={1} /> : null}
+      {expanded ? <ExpandedObject heap={heap} id={id} depth={3} /> : null}
     </>
   );
 }
 
-function ArrayDisplay({ heap, id }: ResultProps): JSX.Element {
+function ArrayDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   const obj = heap[id];
   const [expanded, setExpanded] = useState(false);
   if (obj.type !== "array") return <></>; // tell TS what type we're working with
   return (
     <>
-      <button
-        className="expand-collapse"
-        onClick={() => setExpanded(!expanded)}
-      >
-        {expanded ? "▼" : "▶"}
-      </button>
-      <span className="syntax">{"[ "}</span>
-      {obj.value.map((entryId, ix) => {
-        return (
-          <span key={ix}>
-            <Result heap={heap} id={entryId} />
-            {ix < obj.value.length - 1 ? (
-              <span className="syntax">, </span>
-            ) : null}
-          </span>
-        );
-      })}
-      <span className="syntax">{" ]"}</span>
-      {expanded ? <ExpandedArray heap={heap} id={id} indent={1} /> : null}
+      <span onClick={() => setExpanded(!expanded)}>
+        {depth > 0 ? (
+          <>
+            <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
+
+            <span className="syntax">{"[ "}</span>
+
+            {obj.value.map((entryId, ix) => {
+              return (
+                <span key={ix}>
+                  <Result heap={heap} id={entryId} depth={depth - 1} />
+                  {ix < obj.value.length - 1 ? (
+                    <span className="syntax">, </span>
+                  ) : null}
+                </span>
+              );
+            })}
+            <span className="syntax">{" ]"}</span>
+          </>
+        ) : (
+          <span className="summary">Array({obj.value.length})</span>
+        )}
+      </span>
+
+      {expanded ? <ExpandedArray heap={heap} id={id} depth={3} /> : null}
     </>
   );
 }
 
-interface ExpandedEntryProps extends ResultProps {
-  indent: number;
-}
-function ExpandedArray({ heap, id, indent }: ExpandedEntryProps): JSX.Element {
+function ExpandedArray({ heap, id, depth }: ResultProps): JSX.Element {
   const obj = heap[id];
   if (obj.type !== "array") return <></>;
 
   return (
-    <div className="expanded-array" style={{ paddingLeft: `${indent}em` }}>
+    <div className="expanded array">
       {obj.value.map((entryId, ix) => {
         return (
           <div key={ix}>
             <span className="key">{ix}: </span>
-            <Result heap={heap} id={entryId} />
+            <Result heap={heap} id={entryId} depth={depth - 1} />
           </div>
         );
       })}
@@ -126,18 +151,18 @@ function ExpandedArray({ heap, id, indent }: ExpandedEntryProps): JSX.Element {
   );
 }
 
-function ExpandedObject({ heap, id, indent }: ExpandedEntryProps): JSX.Element {
+function ExpandedObject({ heap, id, depth }: ResultProps): JSX.Element {
   const obj = heap[id];
   if (obj.type !== "object") return <></>;
 
   return (
-    <div className="expanded-array" style={{ paddingLeft: `${indent}em` }}>
+    <div className="expanded object">
       {obj.value.map(({ key, value }, ix) => {
         return (
           <div key={key}>
-            <Result heap={heap} id={key} isKey />
+            <Result heap={heap} id={key} isKey depth={depth - 1} />
             <span className="syntax">: </span>
-            <Result heap={heap} id={value} />
+            <Result heap={heap} id={value} depth={depth - 1} />
           </div>
         );
       })}

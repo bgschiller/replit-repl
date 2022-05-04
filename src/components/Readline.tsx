@@ -48,7 +48,9 @@ export default function Readline({ onEval }: ReadlineProps) {
   const history = useHistory();
   const textarea = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
-    setHeight(expr.split("\n").length * 1.5);
+    // TODO, this isn't quite right. seems to be too big.
+    const height = expr.split("\n").length * 1.5;
+    setHeight(height);
   }, [expr]);
   function valueChanged(evt: ChangeEvent<HTMLTextAreaElement>) {
     setExpr(evt.target.value);

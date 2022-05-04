@@ -25,7 +25,7 @@ export function Entry(props: ScrollbackEntryProps) {
       <pre className="code">{props.code}</pre>
       {"result" in props ? (
         <div className={`result ${props.result[0].type}`}>
-          <Result heap={props.result} id={0} />{" "}
+          <Result heap={props.result} id={0} depth={2} />{" "}
         </div>
       ) : null}
       {"pending" in props ? (

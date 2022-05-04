@@ -3,3 +3,7 @@ button.expand-collapse {
   background: none;
   font-family: monospace;
 }
+
+.expanded {
+  padding-left: 1em;
+}

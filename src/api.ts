@@ -8,6 +8,8 @@ export type Types =
       type: "array";
       value: Array<ID>;
     }
+  | { type: "function"; value: { name: string; body: string; proto: string } }
+  | { type: "regexp"; value: { src: string; flags: "" } }
   | {
       type: "error";
       value: {
