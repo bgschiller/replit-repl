@@ -8,3 +8,7 @@ export function makeid(length: number) {
   }
   return result;
 }
+
+export function assertUnreachable(x: never): never {
+  throw new Error(`expected not to reach this case: ${x}`);
+}

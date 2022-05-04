@@ -5,7 +5,6 @@ import Readline from "./components/Readline";
 import Scrollback, {
   OnResultFunc,
   ScrollbackEntry,
-  ScrollbackEntryProps,
 } from "./components/Scrollback";
 import { makeid } from "./util";
 
