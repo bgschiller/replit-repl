@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { evaluate } from "./api";
 import "./App.css";
 import Readline from "./components/Readline";
@@ -19,6 +19,13 @@ function App() {
     const newScrollback = [...scrollbackData, data];
     setScrollbackData(newScrollback);
   }
+
+  // when new data comes in, scroll to show it
+  useEffect(
+    () => window.scrollTo(0, document.body.scrollHeight),
+    [scrollbackData]
+  );
+
   const onResult: OnResultFunc = (id, heap) => {
     setScrollbackData(
       scrollbackData.map((sd) =>

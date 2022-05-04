@@ -58,6 +58,8 @@ export default function Readline({ onEval }: ReadlineProps) {
   function keydown(evt: KeyboardEvent<HTMLTextAreaElement>) {
     const cursor = textarea.current?.selectionStart;
     if (evt.key === "Enter" && !evt.shiftKey) {
+      if (expr === "") return;
+
       setExpr("");
       onEval(expr);
       history.add(expr);

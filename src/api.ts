@@ -38,9 +38,7 @@ export function evaluate(code: string, contextId: string): Promise<Heap> {
     },
   }).then((resp) => {
     if (!resp.ok) {
-      console.log("evaluation failed");
       return resp.text().then((body) => {
-        console.log("got body", body);
         return { 0: { type: "thrown-error", value: body } };
       });
     }

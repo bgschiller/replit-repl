@@ -4,6 +4,8 @@
   flex-flow: row nowrap;
   border-top: 1px solid #ccc;
   padding: .25em;
+  position: fixed;
+  bottom: 0;
   width: 100%;
   background-color: #eee;
 

@@ -16,10 +16,11 @@ export default function Result({
   depth,
 }: ResultProps): JSX.Element {
   const root = heap[id || 0];
-  if (root.type === "number") return <>{root.value}</>;
+  if (root.type === "number")
+    return <span className="number">{root.value}</span>;
   if (root.type === "string") {
     // TODO: what about really long strings?
-    if (isKey) return <>{root.value}</>; // skip quotes
+    if (isKey) return <span className="key">{root.value}</span>; // skip quotes
     return <>"{root.value}"</>;
   }
   if (root.type === "undefined") {
@@ -69,7 +70,10 @@ function ObjectDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   if (obj.type !== "object") return <></>; // tell TS what type we're working with
   return (
     <>
-      <span onClick={() => setExpanded(!expanded)}>
+      <span
+        className="one-line-array-or-object"
+        onClick={() => setExpanded(!expanded)}
+      >
         {depth > 0 ? (
           <>
             <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
@@ -104,7 +108,10 @@ function ArrayDisplay({ heap, id, depth }: ResultProps): JSX.Element {
   if (obj.type !== "array") return <></>; // tell TS what type we're working with
   return (
     <>
-      <span onClick={() => setExpanded(!expanded)}>
+      <span
+        className="one-line-array-or-object"
+        onClick={() => setExpanded(!expanded)}
+      >
         {depth > 0 ? (
           <>
             <button className="expand-collapse">{expanded ? "▼" : "▶"}</button>
