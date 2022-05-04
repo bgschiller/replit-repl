@@ -1,10 +1,4 @@
-import React, {
-  ChangeEvent,
-  useEffect,
-  useState,
-  KeyboardEvent,
-  useRef,
-} from "react";
+import React, { ChangeEvent, useState, KeyboardEvent, useRef } from "react";
 import { useLocalStorage } from "../util";
 import "./Readline.css";
 
@@ -32,7 +26,6 @@ function useHistory() {
   }
 
   return {
-    value: records[cursor],
     prev,
     next,
     add,
@@ -44,14 +37,10 @@ export interface ReadlineProps {
 }
 export default function Readline({ onEval }: ReadlineProps) {
   const [expr, setExpr] = useState("");
-  const [height, setHeight] = useState(1);
   const history = useHistory();
   const textarea = useRef<HTMLTextAreaElement | null>(null);
-  useEffect(() => {
-    // TODO, this isn't quite right. seems to be too big.
-    const height = expr.split("\n").length * 1.5;
-    setHeight(height);
-  }, [expr]);
+  const height = expr.split("\n").length * 1.5;
+
   function valueChanged(evt: ChangeEvent<HTMLTextAreaElement>) {
     setExpr(evt.target.value);
   }

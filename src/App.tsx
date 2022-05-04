@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { evaluate } from "./api";
 import "./App.css";
 import Readline from "./components/Readline";
-import Scrollback, {
-  OnResultFunc,
-  ScrollbackEntry,
-} from "./components/Scrollback";
+import Scrollback, { ScrollbackEntry } from "./components/Scrollback";
 import { makeid } from "./util";
 
 const contextId = makeid(10);
@@ -15,27 +12,27 @@ function App() {
   function onEval(code: string) {
     // Add just the code for now, along with a promise that
     // resolves with the value.
-    const data = { code, id: makeid(10), pending: evaluate(code, contextId) };
+    const data = { code, id: makeid(10) };
     const newScrollback = [...scrollbackData, data];
     setScrollbackData(newScrollback);
+    evaluate(code, contextId).then((heap) =>
+      setScrollbackData((scrollbackData) => {
+        return scrollbackData.map((sd) =>
+          "id" in sd && sd.id === data.id ? { code: sd.code, result: heap } : sd
+        );
+      })
+    );
   }
 
   // when new data comes in, scroll to show it
-  useEffect(
+  useLayoutEffect(
     () => window.scrollTo(0, document.body.scrollHeight),
     [scrollbackData]
   );
 
-  const onResult: OnResultFunc = (id, heap) => {
-    setScrollbackData(
-      scrollbackData.map((sd) =>
-        "id" in sd && sd.id === id ? { code: sd.code, result: heap } : sd
-      )
-    );
-  };
   return (
     <div className="App">
-      <Scrollback entries={scrollbackData} onResult={onResult} />
+      <Scrollback entries={scrollbackData} />
       <Readline onEval={onEval} />
     </div>
   );

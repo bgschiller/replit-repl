@@ -38,6 +38,8 @@ export function evaluate(code: string, contextId: string): Promise<Heap> {
     },
   }).then((resp) => {
     if (!resp.ok) {
+      // TODO: sometimes we get a CORS error
+      console.log(resp);
       return resp.text().then((body) => {
         return { 0: { type: "thrown-error", value: body } };
       });
