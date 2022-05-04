@@ -1,5 +1,6 @@
 .scrollback-entry {
   margin: 1em 0;
+  font-family: monospace;
 }
 
 .scrollback-entry > * {
@@ -14,4 +15,8 @@
   position: absolute;
   left: .125em;
   content: '>';
+}
+
+.result.thrown-error {
+ background-color: rgb(255 204 204);
 }

@@ -16,7 +16,9 @@ export type Types =
         stack?: string;
       };
     }
+  | { type: "thrown-error"; value: string }
   | { type: "undefined"; value: "" }
+  | { type: "null"; value: "" }
   | { type: "string"; value: string }
   | { type: "number"; value: number }
   | { type: "boolean"; value: boolean };
@@ -32,7 +34,14 @@ export function evaluate(code: string, contextId: string): Promise<Heap> {
     headers: {
       "content-type": "application/json",
     },
-  })
-    .then((resp) => resp.json())
-    .then((body) => body.result);
+  }).then((resp) => {
+    if (!resp.ok) {
+      console.log("evaluation failed");
+      return resp.text().then((body) => {
+        console.log("got body", body);
+        return { 0: { type: "thrown-error", value: body } };
+      });
+    }
+    return resp.json().then((body) => body.result);
+  });
 }

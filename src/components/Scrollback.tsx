@@ -16,13 +16,15 @@ export type ScrollbackEntryProps = ScrollbackEntry & { onResult: OnResultFunc };
 
 export function Entry(props: ScrollbackEntryProps) {
   if ("pending" in props) {
-    props.pending.then((result) => props.onResult(props.id, result));
+    props.pending.then((result) => {
+      props.onResult(props.id, result);
+    });
   }
   return (
     <div className="scrollback-entry">
       <pre className="code">{props.code}</pre>
       {"result" in props ? (
-        <div className="result">
+        <div className={`result ${props.result[0].type}`}>
           <Result heap={props.result} id={0} />{" "}
         </div>
       ) : null}
