@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { evaluate } from "./api";
+import "./App.css";
+import Readline from "./components/Readline";
+import Scrollback, {
+  OnResultFunc,
+  ScrollbackEntry,
+  ScrollbackEntryProps,
+} from "./components/Scrollback";
+import { makeid } from "./util";
+
+const contextId = makeid(10);
 
 function App() {
+  const [scrollbackData, setScrollbackData] = useState<ScrollbackEntry[]>([]);
+  function onEval(code: string) {
+    // Add just the code for now, along with a promise that
+    // resolves with the value.
+    const data = { code, id: makeid(10), pending: evaluate(code, contextId) };
+    const newScrollback = [...scrollbackData, data];
+    setScrollbackData(newScrollback);
+  }
+  const onResult: OnResultFunc = (id, heap) => {
+    setScrollbackData(
+      scrollbackData.map((sd) =>
+        "id" in sd && sd.id === id ? { code: sd.code, result: heap } : sd
+      )
+    );
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Scrollback entries={scrollbackData} onResult={onResult} />
+      <Readline onEval={onEval} />
     </div>
   );
 }

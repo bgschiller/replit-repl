@@ -1,0 +1,17 @@
+.scrollback-entry {
+  margin: 1em 0;
+}
+
+.scrollback-entry > * {
+  padding-left: 1em;
+  position: relative;
+  margin: 0;
+}
+.scrollback-entry .code {
+  color: hsla(200, 50%, 50%, 1);
+}
+.scrollback-entry .code::before {
+  position: absolute;
+  left: .125em;
+  content: '>';
+}

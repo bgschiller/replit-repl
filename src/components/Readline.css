@@ -1,0 +1,33 @@
+/* css lifted from https://codepen.io/uniqname/pen/MYORjX */
+.readline-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  border-top: 1px solid #ccc;
+  padding: .25em;
+  width: 100%;
+  background-color: #eee;
+
+}
+.readline-wrapper::before {
+  content: '>';
+  display: block;
+  color: #ccc;
+  padding: .25em 0;
+}
+
+#readline {
+  height: 1.5em;
+  max-height: 80vh;
+  font-size: 1em;
+  border: none;
+  padding: .25em 0 .25em 1em;
+  font-family: monospace;
+  flex: 1 1 100%;
+  background: transparent;
+  tab-size: 4;
+  overflow: hidden;
+  resize: none;
+}
+#readline:focus {
+  outline: none;
+}
